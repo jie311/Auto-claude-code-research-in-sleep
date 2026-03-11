@@ -212,6 +212,8 @@ Join the WeChat group for discussion on Claude Code + AI-driven research workflo
 
 ## ⭐ Star History
 
+![GitHub stars](https://img.shields.io/github/stars/wanshuiyin/Auto-claude-code-research-in-sleep?style=social)
+
 [![Star History Chart](https://api.star-history.com/svg?repos=wanshuiyin/Auto-claude-code-research-in-sleep&type=Date)](https://star-history.com/#wanshuiyin/Auto-claude-code-research-in-sleep&Date)
 
 ## License
