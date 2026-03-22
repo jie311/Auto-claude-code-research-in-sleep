@@ -96,6 +96,17 @@ test -f ~/.gemini/.env && echo "Gemini env file found"
 codex -C /path/to/your/project
 ```
 
+## 排障
+
+如果默认 API 模型在你当前的免费层时间窗口里返回临时 `429`，不要改 bridge 结构，只需要覆盖 reviewer model：
+
+```bash
+codex mcp remove gemini-review
+codex mcp add gemini-review --env GEMINI_REVIEW_BACKEND=api --env GEMINI_REVIEW_MODEL=gemini-flash-latest -- python3 ~/.codex/mcp-servers/gemini-review/server.py
+```
+
+这不会改变 ARIS 的 reviewer 契约，也不会改变 skill overlay 的组织方式，只是让同一个本地 `gemini-review` bridge 在底层改用另一个 Gemini API 模型。
+
 ## 验证结果摘要
 
 这条路径做了两层验证：
@@ -122,6 +133,7 @@ codex -C /path/to/your/project
 
 - Gemini 免费层对这条 reviewer 路径是可用的，但如果在很短时间内集中压测，仍然可能出现临时 `429`
 - 速率限制表现和具体模型有关；当前 API 模型面应以 AI Studio / `ListModels` 为准，而不是沿用旧配额表里的模型示例
+- 在同一套环境上的后续重试中，把 `GEMINI_REVIEW_MODEL` 覆盖为 `gemini-flash-latest` 后，direct API bridge 已成功跑通同步 review、异步 `review_start` -> `review_status` 以及带 thread 的 `review_reply_start` -> `review_status`
 - 这类 `429` 更像是短时间 burst limit，而不是集成本身失效
 - 对超长 prompt，宿主侧 MCP tool timeout 仍可能先于同步调用返回，所以长审稿默认仍推荐 `review_start` / `review_reply_start` + `review_status`
 

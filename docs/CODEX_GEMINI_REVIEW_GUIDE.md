@@ -95,6 +95,17 @@ test -f ~/.gemini/.env && echo "Gemini env file found"
 codex -C /path/to/your/project
 ```
 
+## Troubleshooting
+
+If the default API model returns temporary free-tier `429` responses in your current window, keep the same bridge and override only the reviewer model:
+
+```bash
+codex mcp remove gemini-review
+codex mcp add gemini-review --env GEMINI_REVIEW_BACKEND=api --env GEMINI_REVIEW_MODEL=gemini-flash-latest -- python3 ~/.codex/mcp-servers/gemini-review/server.py
+```
+
+This does not change the ARIS reviewer contract or skill overlay shape. It only changes the Gemini API model used behind the same local `gemini-review` bridge.
+
 ## Validation Summary
 
 This path was validated in two layers:
@@ -121,6 +132,7 @@ What we observed:
 
 - Gemini free-tier access is practical for this reviewer path, but bursty test loops can still trigger temporary `429` rate-limit responses
 - rate-limit behavior is model-dependent; current API model surfaces should be checked in AI Studio / `ListModels`, not inferred from older quota tables
+- in a later retry on the same setup, the direct API bridge completed sync review, async `review_start` -> `review_status`, and threaded `review_reply_start` -> `review_status` successfully with `GEMINI_REVIEW_MODEL=gemini-flash-latest`
 - those `429` responses behaved like short-window burst limits, not a sign that the integration itself was broken
 - long synchronous reviewer calls can still hit host-side MCP tool timeouts, so the async `review_start` / `review_reply_start` + `review_status` flow remains the recommended default for long prompts
 
