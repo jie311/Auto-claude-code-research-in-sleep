@@ -14,6 +14,8 @@
          让 AI 边睡边帮你做研究
 ```
 
+![ARIS-Code Screenshot](aris-code-screenshot.png)
+
 > **对抗·多智能体研究自动化 CLI**
 > Executor 执行 · Reviewer 审查 · 迭代精进
 
