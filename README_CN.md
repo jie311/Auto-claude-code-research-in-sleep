@@ -552,6 +552,63 @@ NARRATIVE_REPORT.md ──► /paper-plan ──► /paper-figure ──► /pap
 
 </details>
 
+### 工作流 M：Meta-Optimize 🧬（ARIS 优化自己）
+
+> **"分析我的使用模式，改进你自己的技能。"**
+
+与工作流 1–4 优化*研究产物*（论文、代码、实验）不同，工作流 M 优化的是 *harness 本身*——SKILL.md 指令、默认参数和收敛规则。灵感来自 [Meta-Harness](https://arxiv.org/abs/2603.28052)（Lee et al., 2026）。
+
+**设置（一次性）：**
+```bash
+# 启用被动事件日志（通过 Claude Code hooks）
+cp templates/claude-hooks/meta_logging.json .claude/settings.json
+# 或将 "hooks" 部分合并到现有的 .claude/settings.json 中
+```
+
+**使用（累积 5 次以上工作流运行后）：**
+```
+> /meta-optimize                        # 分析所有技能
+> /meta-optimize "auto-review-loop"     # 聚焦单个技能
+> /meta-optimize apply 1                # 应用推荐的修改 #1
+```
+
+**工作原理：**
+
+1. 📊 **被动记录** — hooks 静默记录每次技能调用、工具执行、失败、参数覆盖到 `.aris/meta/events.jsonl`
+2. 🔍 **模式分析** — 识别高频覆盖参数（默认值不好）、重复失败（缺少错误处理）、分数停滞（收敛规则需调整）
+3. 🩹 **生成 Patch** — 对目标 SKILL.md 生成最小修改 + 数据支撑的理由
+4. 🔬 **Reviewer 审核** — GPT-5.4 xhigh 评估每个 patch 是否安全
+5. ✅ **用户批准** — 从不自动应用，用户说了算
+
+```
+┌─────────────────────────────────────────────────────────────────┐
+│                  工作流 M：Meta-Optimize                         │
+│                                                                  │
+│   正常 ARIS 使用（W1-W4）                                        │
+│         │ （hooks 被动记录事件）                                   │
+│         ▼                                                        │
+│   .aris/meta/events.jsonl                                        │
+│         │                                                        │
+│         ▼                                                        │
+│   ┌──────────┐     ┌──────────┐     ┌──────────┐               │
+│   │ 分析模式  │────▶│ 提出      │────▶│ GPT-5.4  │               │
+│   │          │     │ SKILL.md │     │ 审核      │               │
+│   │          │     │ 修改      │     │ patch    │               │
+│   └──────────┘     └──────────┘     └──────────┘               │
+│                                          │                       │
+│                                          ▼                       │
+│                                    用户批准？                     │
+│                                     是 → 应用                    │
+│                                     否 → 跳过                    │
+└─────────────────────────────────────────────────────────────────┘
+```
+
+**优化对象（harness 组件）：** 技能 prompt、默认参数（`difficulty`、`MAX_ROUNDS`、`threshold`）、收敛规则、错误处理模式。
+
+**不优化：** 研究产物（论文、代码、实验）——那是 W1–W4 的工作。
+
+> 💡 这是**维护工作流**，不属于 W1→W1.5→W2→W3→W4 研究流水线。像 `git gc` 一样定期运行。
+
 ---
 
 ## 🧰 全部 Skills

@@ -716,6 +716,75 @@ Got reviews back? `/rebuttal` parses them, builds a strategy, and drafts a venue
 - 🔒 **Commitment** — every promise is user-approved. No overpromising.
 - 🔒 **Coverage** — every reviewer concern is tracked. Nothing disappears.
 
+### Workflow M: Meta-Optimize 🧬 (ARIS optimizes itself)
+
+> **"Analyze my usage patterns and improve your own skills."**
+
+Unlike Workflows 1–4 which optimize *research artifacts* (papers, code, experiments), Workflow M optimizes the *harness itself* — the SKILL.md instructions, default parameters, and convergence rules that govern how ARIS operates. Inspired by [Meta-Harness](https://arxiv.org/abs/2603.28052) (Lee et al., 2026).
+
+**Setup (one-time):**
+```bash
+# Enable passive event logging via Claude Code hooks
+cp templates/claude-hooks/meta_logging.json .claude/settings.json
+# Or merge the "hooks" section into your existing .claude/settings.json
+```
+
+**Usage (after 5+ workflow runs):**
+```
+> /meta-optimize                        # analyze all skills
+> /meta-optimize "auto-review-loop"     # focus on one skill
+> /meta-optimize apply 1                # apply recommended change #1
+```
+
+**How it works:**
+
+1. 📊 **Passive logging** — Claude Code hooks silently record every skill invocation, tool call, failure, parameter override, and user prompt to `.aris/meta/events.jsonl`. Zero user effort.
+2. 🔍 **Pattern analysis** — `/meta-optimize` reads the log and identifies:
+   - Parameters users override most often (bad defaults)
+   - Tools that fail repeatedly in specific skills (missing error handling)
+   - Review score plateaus (convergence rules too loose/tight)
+   - Manual corrections users make (skill gaps)
+3. 🩹 **Patch proposal** — generates minimal diffs to target SKILL.md files with data-backed justifications
+4. 🔬 **Reviewer gate** — GPT-5.4 xhigh reviews each patch: does the evidence support it? could it hurt other users?
+5. ✅ **User approval** — only applied with explicit user consent. All changes are logged and reversible.
+
+```
+┌─────────────────────────────────────────────────────────────────┐
+│                  Workflow M: Meta-Optimize                        │
+│                                                                  │
+│   Normal ARIS usage (W1-W4)                                      │
+│         │ (hooks log events passively)                           │
+│         ▼                                                        │
+│   .aris/meta/events.jsonl                                        │
+│         │                                                        │
+│         ▼                                                        │
+│   ┌──────────┐     ┌──────────┐     ┌──────────┐               │
+│   │ Analyze  │────▶│ Propose  │────▶│ GPT-5.4  │               │
+│   │ patterns │     │ SKILL.md │     │ reviews  │               │
+│   │          │     │ patches  │     │ patch    │               │
+│   └──────────┘     └──────────┘     └──────────┘               │
+│                                          │                       │
+│                                          ▼                       │
+│                                    User approves?                 │
+│                                     Yes → Apply                  │
+│                                     No  → Skip                   │
+└─────────────────────────────────────────────────────────────────┘
+```
+
+**What gets optimized (harness components):**
+| Component | Example |
+|-----------|---------|
+| Skill prompts | Reviewer instructions, quality gates, step descriptions |
+| Default parameters | `difficulty`, `MAX_ROUNDS`, `threshold` |
+| Convergence rules | When to stop the review loop, retry counts |
+| Error handling | Auto-debug patterns, failure recovery steps |
+
+**What does NOT get optimized:** research artifacts (papers, code, experiments) — that's what W1–W4 do.
+
+**Skills involved:** `meta-optimize`
+
+> 💡 This is a **maintenance workflow**, not part of the W1→W1.5→W2→W3→W4 research pipeline. Run it periodically, like `git gc` for your research harness.
+
 ---
 
 ## 🧰 All Skills
